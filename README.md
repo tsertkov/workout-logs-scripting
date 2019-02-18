@@ -6,12 +6,10 @@ Run `make` to recreate all artifacts.
 
 > NB! It will take a lot of time to build docker images on first run.
 
-```
-$ time (make)
->> Building all artifacts with streams.
->> Done. See files in artifacts/ directory.
-( make; )  0.07s user 0.10s system 5% cpu 2.894 total
-```
+- `make all-perl`: Run all perl parts seuentially (See part-*/bash/).
+- `make all-bash`: Run all bash parts seuentially (See part-*/perl/).
+- `stream-bash`: Build all artifacts into `stream-artifacts/` using bash and streams.
+- `stream-perl`: Build all artifacts into `stream-artifacts/` using perl and streams.
 
 ## Original description
 
