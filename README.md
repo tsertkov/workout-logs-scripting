@@ -21,6 +21,13 @@ Run `make` to recreate all artifacts.
 - `make stream-bash`: Build all artifacts with streams using bash into `stream-artifacts/`.
 - `make stream-perl`: Build all artifacts with streams using perl into `stream-artifacts/`.
 
+```bash
+$ time (make stream-perl)
+>> Building all artifacts with streams (using perl).
+>> Done. See files in stream-artifacts/ directory.
+( make stream-perl; )  0.06s user 0.10s system 5% cpu 2.957 total
+```
+
 ## Example artifacts
 
 ### RRDTool
