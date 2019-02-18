@@ -1,4 +1,4 @@
-# Logs and graphs workout
+# Workout: Logs scripting
 
 ## Usage
 
