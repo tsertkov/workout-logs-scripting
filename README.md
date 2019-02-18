@@ -21,6 +21,14 @@ Run `make` to recreate all artifacts.
 - `make stream-bash`: Build all artifacts with streams using bash into `stream-artifacts/`.
 - `make stream-perl`: Build all artifacts with streams using perl into `stream-artifacts/`.
 
+## Example artifacts
+
+### RRDTool
+![image](https://user-images.githubusercontent.com/5339042/52972072-f3936400-33b9-11e9-97e6-8708d302dd6a.png)
+
+### GD::Graph
+![image](https://user-images.githubusercontent.com/5339042/52972160-32c1b500-33ba-11e9-821d-d8653e55eaaa.png)
+
 ## Original description
 
 ```
