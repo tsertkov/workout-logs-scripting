@@ -7,7 +7,7 @@ use HTML::TreeBuilder::XPath;
 use Set::Light;
 use POSIX qw(strftime);
 
-sub sentences_by_url {
+sub get_sentences_by_url {
   my ($url) = @_;
   my $ua = LWP::UserAgent->new();
   my $response = $ua->get($url);
@@ -66,7 +66,7 @@ my @statuses = ("OK", "TEMP", "PERM");
 
 my $ticks = $date_end - $date_start;
 my $dropped_ticks = get_dropped_ticks($ticks, $line_count);
-my @sentences = sentences_by_url($sentences_url);
+my @sentences = get_sentences_by_url($sentences_url);
 
 for (my $tick = 0; $tick < $ticks; $tick++) {
   next if ($dropped_ticks->has($tick));
