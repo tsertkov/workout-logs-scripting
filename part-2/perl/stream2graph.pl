@@ -52,6 +52,6 @@ $graph->set(
   x_label_skip      => 5,
   x_labels_vertical => 1,
   transparent       => 0,
-) or die $graph->error;
+);
 
 print $graph->plot(\@data)->png;
