@@ -6,6 +6,10 @@ This repo contains scripts for playing around following topics:
 - Graphing log stream
 - Processing log stream
 
+## Prerequisites 
+
+Docker, `make`, and `bash` must be available.
+
 ## Usage
 
 Run `make` to recreate all artifacts.
