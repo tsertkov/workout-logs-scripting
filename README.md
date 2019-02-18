@@ -1,5 +1,11 @@
 # Workout: Logs scripting
 
+This repo contains scripts for playing around following topics:
+
+- Emitting log stream
+- Graphing log stream
+- Processing log stream
+
 ## Usage
 
 Run `make` to recreate all artifacts.
