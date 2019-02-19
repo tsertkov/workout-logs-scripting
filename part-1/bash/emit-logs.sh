@@ -14,6 +14,12 @@ SENTENCES_URL="https://en.wikipedia.org/wiki/Amazon_S3"
 STATUS_ARR=("OK" "TEMP" "PERM")
 DELIMITER="|"
 
+# Shell is not reacting to Ctrl+C immediately otherwise
+trap ctrl_c INT
+function ctrl_c() {
+  exit 1
+}
+
 function get_sentences {
   url="$1"
   # '/^Notes\[edit\]/q'    - remove everything after "Notes"
