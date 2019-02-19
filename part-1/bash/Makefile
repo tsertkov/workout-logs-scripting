@@ -6,7 +6,7 @@ all: build $(file)
 build:
 	docker build -t $(image) .
 clean:
-	rm -f stream.log
+	rm -f $(file)
 stream:
 	@docker run --rm -i $(image)
 watch:
