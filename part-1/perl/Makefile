@@ -2,6 +2,7 @@ file = stream.log
 image = part-1:perl
 
 all: build $(file)
+
 build:
 	docker build -t $(image) .
 clean:
