@@ -17,7 +17,6 @@ delimiter = "|"
 statuses = ["OK", "TEMP", "PERM"]
 
 def get_sentences (url):
-    url = 'https://en.wikipedia.org/wiki/Amazon_S3'
     html = urlopen(url)
     soup = BeautifulSoup(html, 'html.parser')
     lines = []
