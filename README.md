@@ -6,7 +6,7 @@ This repo contains scripts for playing around following topics:
 - Graphing log stream
 - Processing log stream
 
-## Prerequisites 
+## Prerequisites
 
 Docker, `make`, and `bash` must be available.
 
@@ -18,8 +18,10 @@ Run `make` to recreate all artifacts.
 
 - `make all-perl`: Run all perl parts sequentially (See `part-*/perl/`).
 - `make all-bash`: Run all bash parts sequentially (See `part-*/bash/`).
+- `make all-python`: Run all bash parts sequentially (See `part-*/python/`).
 - `make stream-bash`: Build all artifacts with streams using bash into `stream-artifacts/`.
 - `make stream-perl`: Build all artifacts with streams using perl into `stream-artifacts/`.
+- `make stream-python`: Build all artifacts with streams using python into `stream-artifacts/`.
 
 ```bash
 $ time (make stream-perl)
