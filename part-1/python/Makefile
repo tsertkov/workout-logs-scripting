@@ -9,5 +9,5 @@ clean:
 	rm -f $(file)
 stream:
 	@docker run --rm -i $(image)
-stream.log:
+$(file):
 	docker run --rm -i $(image) > $(file)
