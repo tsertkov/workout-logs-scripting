@@ -38,3 +38,5 @@ $ time (make stream-perl)
 ### GD::Graph
 ![image](https://user-images.githubusercontent.com/5339042/52972160-32c1b500-33ba-11e9-821d-d8653e55eaaa.png)
 
+### Matplotlib
+![image](https://user-images.githubusercontent.com/5339042/53340351-1ae1b800-3909-11e9-96a4-df77397cfcbd.png)
