@@ -33,11 +33,15 @@ $ time (make stream-perl)
 
 ## Example artifacts
 
-### RRDTool
+### RRDTool (Bash)
 ![image](https://user-images.githubusercontent.com/5339042/52972072-f3936400-33b9-11e9-97e6-8708d302dd6a.png)
 
-### GD::Graph
+### GD::Graph (Perl)
 ![image](https://user-images.githubusercontent.com/5339042/52972160-32c1b500-33ba-11e9-821d-d8653e55eaaa.png)
 
-### Matplotlib
+### Matplotlib (Python)
 ![image](https://user-images.githubusercontent.com/5339042/53340351-1ae1b800-3909-11e9-96a4-df77397cfcbd.png)
+
+### D3 (JavaScript)
+![image](https://user-images.githubusercontent.com/5339042/53764157-c9b76280-3ecc-11e9-9127-c99b1d54ddf9.png)
+
