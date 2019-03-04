@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/britecharts@2/dist/css/britecharts.min.css">
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/britecharts@2/dist/bundled/britecharts.min.js"></script>
+<script>
+  const logStreamer = new Worker(URL.createObjectURL(new Blob(['('+
+    function () {
+      self.onmessage = (e) => {
+        if (typeof e.data !== 'object') return
+        if (e.data.action === 'start-stream') {
+          startLogStream(e.data.options)
+        }
+      }
+
+      function getDrops (total, max, min) {
+        const ticksCount = max - min
+        const dropsCount = ticksCount - total
+        const drops = []
+        while (drops.length < dropsCount) {
+          const rnd = Math.floor(Math.random() * ticksCount) + min
+          if (drops.indexOf(rnd) !== -1) continue
+          drops.push(rnd)
+        }
+        return drops
+      }
+
+      function startLogStream ({
+        sentences,
+        dateStart,
+        dateEnd,
+        padChar,
+        pidMin,
+        pidMax,
+        lineLength,
+        lineCount,
+        statuses
+      }) {
+        const getPid = () => Math.floor(Math.random() * (pidMax - pidMin)) + pidMin
+        const getStatus = () => statuses[Math.floor(Math.random() * statuses.length)]
+        const getData = () => sentences[Math.floor(Math.random() * sentences.length)]
+        const drops = getDrops(lineCount, dateEnd, dateStart)
+
+        for (let tick = dateStart; tick < dateEnd; tick++) {
+          if (drops.indexOf(tick) !== -1) continue
+          const d = new Date(tick * 1000)
+          const date = [
+            d.getUTCFullYear(),
+            (d.getUTCMonth() + 1).toString().padStart(2, '0'),
+            (d.getUTCDate()).toString().padStart(2, '0')
+          ].join('')
+          const time = [
+            d.getUTCHours().toString().padStart(2, '0'),
+            d.getUTCMinutes().toString().padStart(2, '0'),
+            d.getUTCSeconds().toString().padStart(2, '0')
+          ].join(':')
+
+          let msg = [
+            date,
+            time,
+            getPid(),
+            getStatus(),
+            getData()
+          ].join('|')
+
+          msg = msg.substr(0, lineLength - 1)
+          msg += '|'
+          msg = msg.padEnd(lineLength, padChar)
+
+          postMessage(msg)
+        }
+        postMessage('')
+      }
+    }.toString()
+  +')()'])))
+
+  async function getSentences (url) {
+    const json = await fetch(url).then(res => res.json())
+    const text = json.parse.text['*']
+    const frag = document.implementation.createHTMLDocument('preview')
+    const div = frag.createElement('div')
+    div.innerHTML = text
+
+    let lines = [];
+    ['//p', '//ul/li'].forEach(expr => {
+      const res = document.evaluate(expr, div)
+      let found
+      while (found = res.iterateNext()) {
+        const foundLines = found.textContent
+          .replace(/\[[^\]]+\]/g, '')
+          .trim()
+          .split('. ')
+          .filter(line =>
+            line.match(/^[A-Z]/) &&
+            line.split(/\s+/g).length > 2
+          ).map(line =>
+            line.replace(/[.:\n]$/, '') + '.'
+          )
+
+        lines.push(...foundLines)
+      }
+    })
+    return lines
+  }
+
+  const logParser = {
+    stats: {
+      msgByMinute: [],
+      words: {}
+    },
+
+    groupedDataRow: {},
+
+    topwords () {
+      return Object.entries(this.stats.words)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10)
+    },
+
+    pushMsg (msg) {
+      const [date, time, pid, status, data] = msg.split('|', 5)
+      const year = date.substr(0, 4)
+      const month = date.substr(4, 2)
+      const day = date.substr(6, 2)
+      const hours = time.substr(0, 2)
+      const minutes = time.substr(3, 2)
+      const seconds = time.substr(6, 2)
+      const dateObj = new Date(year, month - 1, day, hours, minutes, seconds)
+
+      this.pushWords(data
+        .split(/\W/)
+        .filter(word => word.length)
+      )
+
+      const ts = Math.floor(dateObj / 60000) * 60000
+      let row = this.groupedDataRow
+      if (row.date && row.date !== ts) {
+        row.drops = this.dropsByMinuteRow(row)
+        this.stats.msgByMinute.push(row)
+        row = this.groupedDataRow = {}
+      }
+
+      row.date = ts
+      row[status] = (row[status] || 0) + 1
+    },
+
+    pushWords (words) {
+      words.forEach(word => {
+        this.stats.words[word] = (this.stats.words[word] || 0) + 1
+      })
+    },
+
+    eof () {
+      this.groupedDataRow.drops = this.dropsByMinuteRow(this.groupedDataRow)
+      this.stats.msgByMinute.push(this.groupedDataRow)
+    },
+
+    dropsByMinuteRow (row) {
+      return Object.keys(row).reduce((drops, key) =>
+        key === 'date'
+          ? drops
+          : drops - row[key]
+      , 60)
+    }
+  }
+
+  function renderMsgByMinuteGraph (groupedData) {
+    const dataset = groupedData.reduce((a, v) => {
+      for (const key of Object.keys(v)) {
+        if (key === 'date') continue
+        a.push({
+          date: v.date,
+          name: key,
+          count: v[key]
+        })
+      }
+      return a
+    }, [])
+
+    const stackedArea = britecharts.stackedArea()
+    const container = d3.select(document.body)
+    const containerWidth = container.node().getBoundingClientRect().width
+    const chartTooltip = britecharts.tooltip()
+
+    stackedArea
+      .areaOpacity(0.9)
+      .tooltipThreshold(600)
+      .width(containerWidth)
+      .xAxisFormat('custom')
+      .xAxisCustomFormat('%H:%M')
+      .xTicks(12)
+      .yTicks(4)
+      .valueLabel('count')
+      .keyLabel('name')
+      .topicsOrder(['OK', 'TEMP', 'PERM', 'drops'])
+      .on('customMouseOver', chartTooltip.show)
+      .on('customMouseMove', chartTooltip.update)
+      .on('customMouseOut', chartTooltip.hide)
+
+    stackedArea.colorSchema(['24BC14', 'ECD748', 'EA644A', '000000'])
+    container
+      .datum(dataset)
+      .call(stackedArea)
+
+    chartTooltip
+      .topicLabel('values')
+      .title('Sample time')
+      .dateFormat(chartTooltip.axisTimeCombinations.CUSTOM)
+      .dateCustomFormat('%H:%M')
+      .topicsOrder(['OK', 'TEMP', 'PERM', 'drops'])
+
+    d3.select('.metadata-group .vertical-marker-container')
+      .attr('opacity', '0.8')
+      .datum([])
+      .call(chartTooltip)
+  }
+
+  function renderTopWords (wordStats) {
+    const pre = document.createElement('pre')
+    pre.innerHTML = 'Topwords\n---\n'
+    wordStats.forEach(([word, count]) => {
+      pre.innerHTML += `${word}\t\t${count}\n`
+    })
+    document.body.appendChild(pre)
+  }
+
+  ;(async function () {
+    const url = 'https://en.wikipedia.org/w/api.php?action=parse&prop=text&page=Amazon_S3&format=json'
+    const sentences = await getSentences(`https://cors.io/?${url}`)
+    const date = 1325376000
+
+    logStreamer.postMessage({
+      action: 'start-stream',
+      options: {
+        sentences,
+        dateStart: date + 3600 * 9,
+        dateEnd: date + 3600 * (9 + 3),
+        padChar: "X",
+        statuses: ['OK', 'TEMP', 'PERM'],
+        pidMin: 3000,
+        pidMax: 5000,
+        lineLength: 500,
+        lineCount: 10000
+      }
+    })
+
+    logStreamer.onmessage = (e) => {
+      const msg = e.data
+      if (msg === '') {
+        logParser.eof()
+        renderMsgByMinuteGraph(logParser.stats.msgByMinute)
+        renderTopWords(logParser.topwords())
+      } else {
+        logParser.pushMsg(msg)
+      }
+    }
+  })()
+</script>
+</head>
+<body>
+  <h1>Log stream generation & analytics</h1>
+  <p>All steps in one place: emit log stream -> parse stream -> graph.</p>
+</body>
+</html>

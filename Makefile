@@ -40,3 +40,5 @@ stream-python:
 			>(cd part-3/python && make stream > ../../stream-artifacts/topwords.tsv) \
 	'
 	@echo ">> Done. See files in stream-artifacts/ directory."
+all-browser:
+	@open js-all-in-one/index.html
