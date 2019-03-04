@@ -16,7 +16,7 @@ Run `make` to recreate all artifacts.
 
 > NB! It will take a lot of time to build docker images on first run.
 
-- `make all-browser`: Run single file webapp in browser.
+- `make all-browser`: Open `js-all-in-one/index.html` in browser.
 - `make all-perl`: Run all perl parts sequentially (See `part-*/perl/`).
 - `make all-bash`: Run all bash parts sequentially (See `part-*/bash/`).
 - `make all-python`: Run all bash parts sequentially (See `part-*/python/`).
